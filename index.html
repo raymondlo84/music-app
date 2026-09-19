@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎤 FREESTYLE FORGE — Beat Sequencer</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <h1>RAP STUDIO</h1>
+      <p class="subtitle">BEAT SEQUENCER</p>
+    </header>
+
+    <!-- Pattern selector -->
+    <div class="patterns">
+      <select id="pattern-select">
+        <option value="boomBap">Boom Bap (90 BPM)</option>
+        <option value="boom">Boom (95 BPM)</option>
+        <option value="trap">Trap (145 BPM)</option>
+      </select>
+    </div>
+
+    <!-- Transport controls -->
+    <div class="transport">
+      <button id="btn-play" class="btn btn-play">▶ PLAY</button>
+      <button id="btn-stop" class="btn btn-stop">■ STOP</button>
+      <div class="bpm-control">
+        <label for="bpm-slider">BPM</label>
+        <input type="range" id="bpm-slider" min="60" max="200" value="95" step="1">
+        <span id="bpm-value">95</span>
+      </div>
+      <div class="step-indicator" id="step-display">-</div>
+    </div>
+
+    <!-- Step numbers -->
+    <div class="step-numbers" id="step-numbers">
+      <!-- Rendered by UI -->
+    </div>
+
+    <!-- Sequencer grid -->
+    <div class="sequencer-grid" id="sequencer-grid">
+      <!-- Rendered by UI -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      CLICK STEPS TO BUILD BEATS · ADJUST BPM · HIT PLAY
+    </footer>
+  </div>
+
+  <!-- Load modules in dependency order -->
+  <script src="js/audio_engine.js"></script>
+  <script src="js/synth.js"></script>
+  <script src="js/sequencer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
