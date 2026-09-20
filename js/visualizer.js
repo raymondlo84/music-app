@@ -3,7 +3,7 @@
  * Draws frequency bars on #visualizer canvas using analyser data.
  */
 const Visualizer = (() => {
-  let animId = null;
+  let animInterval = null;
   let canvas = null;
   let ctx = null;
   let analyser = null;
@@ -18,20 +18,27 @@ const Visualizer = (() => {
   }
 
   function draw() {
-    animId = requestAnimationFrame(draw);
     resizeCanvas();
 
     ctx.fillStyle = '#0d0d0d';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    analyser.getByteFrequencyData(dataArray);
+    if (analyser && dataArray) {
+      analyser.getByteFrequencyData(dataArray);
+    }
 
     const barWidth = (canvas.width / barCount) - 1;
     let x = 0;
 
     for (let i = 0; i < barCount; i++) {
-      const idx = Math.floor(i * stepSize);
-      const barHeight = (dataArray[idx] / 255) * (canvas.height - 4);
+      let barHeight = 0;
+      if (analyser && dataArray) {
+        const idx = Math.min(Math.floor(i * stepSize), dataArray.length - 1);
+        barHeight = (dataArray[idx] / 255) * (canvas.height - 4);
+      } else {
+        // Fallback: draw placeholder bars when audio is suspended
+        barHeight = (Math.sin(i * 0.8 + Date.now() / 500) * 0.5 + 0.5) * (canvas.height * 0.4) + 4;
+      }
 
       const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
       gradient.addColorStop(0, '#00aa55');
@@ -58,34 +65,20 @@ const Visualizer = (() => {
     stepSize = analyser.frequencyBinCount / barCount;
     dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-    // Resize immediately AND on next rAF
+    // Resize immediately
     resizeCanvas();
-    requestAnimationFrame(() => {
-      resizeCanvas();
-      draw();
-    });
+
+    // Use setInterval for reliable animation in headless/served pages
+    animInterval = setInterval(draw, 50);
+    draw();
 
     window.addEventListener('resize', resizeCanvas);
   }
 
-  // Auto-resize canvas on DOMContentLoaded as fallback (for cached/served pages)
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      const c = document.getElementById('visualizer');
-      if (c) {
-        c.width = c.offsetWidth;
-        c.height = c.offsetHeight;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#0d0d0d';
-        ctx.fillRect(0, 0, c.width, c.height);
-      }
-    });
-  }
-
   function stop() {
-    if (animId) {
-      cancelAnimationFrame(animId);
-      animId = null;
+    if (animInterval) {
+      clearInterval(animInterval);
+      animInterval = null;
     }
     window.removeEventListener('resize', resizeCanvas);
   }
