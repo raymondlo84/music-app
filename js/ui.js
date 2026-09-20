@@ -572,6 +572,7 @@ const SequencerUI = (() => {
 
     const reverbMerge = ctx.createGain();
 
+    // Wire: masterGain → reverbDry (dry) + convolver (wet reverb)
     const masterGain = AudioEngine.getMasterGain();
     masterGain.connect(reverbDry);
     masterGain.connect(convolver);
@@ -580,7 +581,7 @@ const SequencerUI = (() => {
     reverbDry.connect(reverbMerge);
     reverbWet.connect(reverbMerge);
 
-    // Wire: reverbMerge -> delayDry -> filter -> analyser
+    // Wire: reverbMerge → delayDry → delay chain → filter → analyser
     const delayDry = ctx.createGain();
     delayDry.gain.value = 1.0;
     reverbMerge.connect(delayDry);
