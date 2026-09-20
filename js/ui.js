@@ -191,9 +191,16 @@ const SequencerUI = (() => {
     const stepNums = document.getElementById('step-numbers');
     if (!grid || !stepNums) return;
 
-    // Step numbers with 100px placeholder to match track-info width
-    stepNums.innerHTML = '<span style="width:100px;flex-shrink:0;display:block"></span>';
+    // Step numbers - flex container matching track-steps layout (100px placeholder + 16 steps)
+    stepNums.innerHTML = '';
+    stepNums.style.display = 'flex';
+    stepNums.style.alignItems = 'center';
+    const spacer = document.createElement('span');
+    spacer.style.width = '100px';
+    spacer.style.flexShrink = '0';
+    stepNums.appendChild(spacer);
     const stepGroup = document.createElement('span');
+    stepGroup.style.display = 'flex';
     stepGroup.style.gap = '3px';
     for (let i = 0; i < 16; i++) {
       const span = document.createElement('span');
