@@ -619,6 +619,7 @@ const SequencerUI = (() => {
 
     const analyser = AudioEngine.getAnalyser();
     filterNode.connect(analyser);
+    analyser.connect(ctx.destination);
 
     // Store references
     AudioEngine.setReverbWet(reverbWet);

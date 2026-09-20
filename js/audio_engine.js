@@ -37,9 +37,6 @@ const AudioEngine = (() => {
       compressor.gain.value = 1;
     }
 
-    masterGain.connect(compressor);
-    compressor.connect(ctx.destination);
-
     // Analyser for visualizer — connected later by UI.initFX() in the FX chain
     analyser = ctx.createAnalyser();
     analyser.fftSize = 128;
