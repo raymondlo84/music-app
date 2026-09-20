@@ -191,25 +191,15 @@ const SequencerUI = (() => {
     const stepNums = document.getElementById('step-numbers');
     if (!grid || !stepNums) return;
 
-    // Step numbers - flex container matching track-steps layout (100px placeholder + 16 steps)
+    // Step numbers - CSS handles padding (100px left offset for track-info column) and gap
     stepNums.innerHTML = '';
-    stepNums.style.display = 'flex';
-    stepNums.style.alignItems = 'center';
-    const spacer = document.createElement('span');
-    spacer.style.width = '100px';
-    spacer.style.flexShrink = '0';
-    stepNums.appendChild(spacer);
-    const stepGroup = document.createElement('span');
-    stepGroup.style.display = 'flex';
-    stepGroup.style.gap = '3px';
     for (let i = 0; i < 16; i++) {
       const span = document.createElement('span');
       span.className = 'step-num' + (i % 4 === 0 ? ' beat' : '');
       span.textContent = i + 1;
       span.dataset.step = i;
-      stepGroup.appendChild(span);
+      stepNums.appendChild(span);
     }
-    stepNums.appendChild(stepGroup);
 
     // Track rows
     grid.innerHTML = '';
