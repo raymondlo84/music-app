@@ -629,29 +629,6 @@ body {
 }
 
 /* Visualizer container */
-.visualizer-container {
-  margin-bottom: 16px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--bg);
-}
-
-.visualizer-container canvas {
-  display: block;
-  width: 100%;
-  height: 80px;
-}
-
-/* Swing control */
-.swing-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-}
 
 .swing-control label {
   color: var(--text-dim);

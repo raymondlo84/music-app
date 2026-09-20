@@ -18,7 +18,6 @@
   SequencerUI.loadPattern('boomBap');
 
   // Start visualizer
-  Visualizer.start();
 
   // Pattern selector
   const select = document.getElementById('pattern-select');
