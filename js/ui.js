@@ -116,7 +116,9 @@ const SequencerUI = (() => {
     const swingSlider = document.getElementById('swing-slider');
     const swingValue = document.getElementById('swing-value');
     swingSlider.addEventListener('input', () => {
-      swingValue.textContent = swingSlider.value + '%';
+      const v = parseInt(swingSlider.value);
+      Sequencer.setSwing(v);
+      swingValue.textContent = v + '%';
     });
 
     // ---- Pattern selector ----

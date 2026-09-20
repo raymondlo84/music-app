@@ -8,6 +8,7 @@ const Sequencer = (() => {
   let lookahead = 25;
   let timerID;
   let totalSteps = 16;
+  let swing = 0; // 0-100, applied to odd-numbered step delays
 
   // Per-track state: { muted, solo, volume, steps: [0/1 repeated 16] }
   let tracks = [];
@@ -94,63 +95,18 @@ const Sequencer = (() => {
     return true;
   }
 
-  function playStep(trackName, stepIndex, time) {
-    const synth = window.Synthesizer;
-    if (!synth) return;
-
-    // Find corresponding track
-    let step = 0;
-    for (let i = 0; i < 16; i++) {
-      if (stepIndex % 16 === i && i === stepIndex % 16) {
-        step = i;
-        break;
-      }
-    }
-    step = stepIndex % 16;
-
-    const track = getTrackByName(trackName);
-    if (!track || !track.steps[step]) return;
-    if (!shouldPlay(track)) return;
-
-    switch (trackName) {
-      case 'kick':
-        synth.kick(time, { gain: track.volume });
-        break;
-      case 'snare':
-        synth.snare(time, { gain: track.volume });
-        break;
-      case 'hihat':
-        synth.hihat(time, { gain: track.volume * 0.8 });
-        break;
-      case 'openHat':
-        synth.openHat(time, { gain: track.volume * 0.6 });
-        break;
-      case 'clap':
-        synth.clap(time, { gain: track.volume });
-        break;
-      case 'rim':
-        synth.rim(time, { gain: track.volume });
-        break;
-      case 'shaker':
-        synth.shaker(time, { gain: track.volume * 0.5 });
-        break;
-      case 'bass':
-        if (track.notes && track.notes[step]) {
-          synth.bass(time, {
-            note: track.notes[step],
-            duration: (60 / bpm / 4) * 3,
-            gain: track.volume
-          });
-        }
-        break;
-    }
-  }
-
   // Schedule a batch of steps ahead
   function schedule() {
     while (nextStepTime < AudioEngine.getContext().currentTime + scheduleAheadTime) {
       currentStep++;
       if (currentStep >= totalSteps) currentStep = 0;
+
+      // Apply swing: odd-numbered steps are delayed proportionally
+      let swingOffset = 0;
+      if (currentStep % 2 === 1 && swing > 0) {
+        swingOffset = (swing / 100) * (60 / bpm / 4) * 0.5;
+      }
+      let stepTime = nextStepTime + swingOffset;
 
       // Play all active tracks for this step
       tracks.forEach(track => {
@@ -159,26 +115,26 @@ const Sequencer = (() => {
           const step = currentStep % 16;
           switch (track.name) {
             case 'kick':
-              Synthesizer.kick(nextStepTime, { gain: track.volume * 1.2 });
+              Synthesizer.kick(stepTime, { gain: track.volume * 1.2 });
               break;
             case 'snare':
-              Synthesizer.snare(nextStepTime, { gain: track.volume });
+              Synthesizer.snare(stepTime, { gain: track.volume });
               break;
             case 'hihat':
-              Synthesizer.hihat(nextStepTime, { gain: track.volume * 0.7 });
+              Synthesizer.hihat(stepTime, { gain: track.volume * 0.7 });
               break;
             case 'clap':
-              Synthesizer.clap(nextStepTime, { gain: track.volume });
+              Synthesizer.clap(stepTime, { gain: track.volume });
               break;
             case 'rim':
-              Synthesizer.rim(nextStepTime, { gain: track.volume });
+              Synthesizer.rim(stepTime, { gain: track.volume });
               break;
             case 'shaker':
-              Synthesizer.shaker(nextStepTime, { gain: track.volume * 0.4 });
+              Synthesizer.shaker(stepTime, { gain: track.volume * 0.4 });
               break;
             case 'bass':
               if (track.notes && track.notes[step]) {
-                Synthesizer.bass(nextStepTime, {
+                Synthesizer.bass(stepTime, {
                   note: track.notes[step],
                   duration: (60 / bpm / 4) * 3,
                   gain: track.volume * 0.9
@@ -191,7 +147,7 @@ const Sequencer = (() => {
 
       // Notify UI on step change
       if (onStepChange) {
-        onStepChange(currentStep % 16, nextStepTime);
+        onStepChange(currentStep % 16, stepTime);
       }
 
       nextStepTime += (60 / bpm / 4);
@@ -227,6 +183,10 @@ const Sequencer = (() => {
     bpm = Math.max(60, Math.min(200, val));
   }
 
+  function setSwing(val) {
+    swing = Math.max(0, Math.min(100, val));
+  }
+
   function onStep(callback) { onStepChange = callback; }
   function onPlayState(callback) { onPlayStateChange = callback; }
 
@@ -234,12 +194,13 @@ const Sequencer = (() => {
 
   return {
     initTracks, start, stop, toggle, shouldPlay,
-    toggleStep, setStep, setVolume, setMute, setSolo,
+    toggleStep, setStep, setVolume, setMute, setSolo, setSwing,
     getTrack, getTrackByName, getTrackIndex, setBPM,
     onStep, onPlayState, getTotalSteps,
     getCurrentStep: () => (currentStep % 16),
     isPlaying: () => playing,
     getBPM: () => bpm,
-    getTracks: () => tracks
+    getTracks: () => tracks,
+    getSwing: () => swing
   };
 })();
