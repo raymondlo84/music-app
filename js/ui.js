@@ -116,9 +116,7 @@ const SequencerUI = (() => {
     const swingSlider = document.getElementById('swing-slider');
     const swingValue = document.getElementById('swing-value');
     swingSlider.addEventListener('input', () => {
-      const v = parseInt(swingSlider.value);
-      Sequencer.setSwing(v);
-      swingValue.textContent = v + '%';
+      swingValue.textContent = swingSlider.value + '%';
     });
 
     // ---- Pattern selector ----
@@ -193,12 +191,15 @@ const SequencerUI = (() => {
     const stepNums = document.getElementById('step-numbers');
     if (!grid || !stepNums) return;
 
-    // Step numbers: 100px placeholder (matches track-info width) + 16 numbered slots
-    stepNums.innerHTML = '<div class="step-num-placeholder"></div>' +
-      '<div class="step-num-group">' +
-      Array.from({length: 16}, (_, i) =>
-        `<span class="step-num${i % 4 === 0 ? ' beat' : ''}" data-step="${i}">${i + 1}</span>`
-      ).join('') + '</div>';
+    // Step numbers
+    stepNums.innerHTML = '';
+    for (let i = 0; i < 16; i++) {
+      const span = document.createElement('span');
+      span.className = 'step-num' + (i % 4 === 0 ? ' beat' : '');
+      span.textContent = i + 1;
+      span.dataset.step = i;
+      stepNums.appendChild(span);
+    }
 
     // Track rows
     grid.innerHTML = '';
@@ -572,7 +573,6 @@ const SequencerUI = (() => {
 
     const reverbMerge = ctx.createGain();
 
-    // Wire: masterGain → reverbDry (dry) + convolver (wet reverb)
     const masterGain = AudioEngine.getMasterGain();
     masterGain.connect(reverbDry);
     masterGain.connect(convolver);
@@ -581,7 +581,7 @@ const SequencerUI = (() => {
     reverbDry.connect(reverbMerge);
     reverbWet.connect(reverbMerge);
 
-    // Wire: reverbMerge → delayDry → delay chain → filter → analyser
+    // Wire: reverbMerge -> delayDry -> filter -> analyser
     const delayDry = ctx.createGain();
     delayDry.gain.value = 1.0;
     reverbMerge.connect(delayDry);
