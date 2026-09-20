@@ -56,12 +56,16 @@ const Sequencer = (() => {
 
   // Toggle step on/off
   function toggleStep(trackName, stepIndex) {
+    if (!trackName || typeof stepIndex !== 'number') return;
+    if (stepIndex < 0 || stepIndex >= 16) return;
     const track = getTrackByName(trackName);
     if (!track) return;
     track.steps[stepIndex] = track.steps[stepIndex] ? 0 : 1;
   }
 
   function setStep(trackName, stepIndex, value) {
+    if (!trackName || typeof stepIndex !== 'number') return;
+    if (stepIndex < 0 || stepIndex >= 16) return;
     const track = getTrackByName(trackName);
     if (!track) return;
     track.steps[stepIndex] = value;

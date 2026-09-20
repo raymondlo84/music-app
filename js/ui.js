@@ -276,6 +276,7 @@ const SequencerUI = (() => {
       controls.appendChild(muteBtn);
       controls.appendChild(soloBtn);
       controls.appendChild(volSlider);
+      controls.appendChild(volLabel);
       trackInfo.appendChild(nameEl);
       trackInfo.appendChild(controls);
 
