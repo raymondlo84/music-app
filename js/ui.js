@@ -385,6 +385,9 @@ const SequencerUI = (() => {
 
     const dens = densityMap[genreKey] || densityMap.boomBap;
 
+    // Preserve current BPM — only randomize step patterns
+    const currentBpm = Sequencer.getBPM();
+
     TRACK_NAMES.forEach(trackName => {
       for (let i = 0; i < 16; i++) {
         const on = Math.random() < dens[trackName];
@@ -392,9 +395,10 @@ const SequencerUI = (() => {
       }
     });
 
-    Sequencer.setBPM(base.bpm);
-    document.getElementById('bpm-value').textContent = base.bpm;
-    document.getElementById('bpm-slider').value = base.bpm;
+    // Restore original BPM
+    Sequencer.setBPM(currentBpm);
+    document.getElementById('bpm-value').textContent = currentBpm;
+    document.getElementById('bpm-slider').value = currentBpm;
 
     buildGrid();
   }
@@ -409,7 +413,12 @@ const SequencerUI = (() => {
       tracks: {}
     };
     tracks.forEach(t => {
-      state.tracks[t.name] = t.steps.slice();
+      state.tracks[t.name] = {
+        steps: t.steps.slice(),
+        volume: t.volume,
+        muted: t.muted,
+        solo: t.solo
+      };
     });
 
     const saved = savedPatterns();
@@ -433,10 +442,21 @@ const SequencerUI = (() => {
     document.getElementById('bpm-value').textContent = entry.bpm;
     document.getElementById('bpm-slider').value = entry.bpm;
 
-    Object.entries(entry.tracks).forEach(([trackName, steps]) => {
-      steps.forEach((val, i) => {
-        Sequencer.setStep(trackName, i, val);
-      });
+    Object.entries(entry.tracks).forEach(([trackName, trackData]) => {
+      if (trackData.steps) {
+        trackData.steps.forEach((val, i) => {
+          Sequencer.setStep(trackName, i, val);
+        });
+      }
+      if (trackData.volume !== undefined) {
+        Sequencer.setVolume(trackName, trackData.volume);
+      }
+      if (trackData.muted !== undefined) {
+        Sequencer.setMute(trackName, trackData.muted);
+      }
+      if (trackData.solo !== undefined) {
+        Sequencer.setSolo(trackName, trackData.solo);
+      }
     });
 
     // Restore FX
