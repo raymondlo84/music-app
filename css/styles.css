@@ -204,10 +204,20 @@ body {
 /* Step numbers */
 .step-numbers {
   display: flex;
-  justify-content: center;
-  gap: 0;
-  padding: 0 0 8px;
-  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px 8px;
+}
+
+.step-numbers .step-num-placeholder {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.step-numbers .step-num-group {
+  display: flex;
+  gap: 3px;
+  flex: 1;
 }
 
 .step-num {
