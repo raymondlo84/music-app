@@ -90,7 +90,9 @@ const SequencerUI = (() => {
     const btnPunch = document.getElementById('btn-punch');
 
     btnPlay.addEventListener('click', () => {
-      Sequencer.toggle();
+      AudioEngine.ensureReady().then(() => {
+        Sequencer.toggle();
+      });
     });
     btnStop.addEventListener('click', () => {
       Sequencer.stop();
@@ -116,7 +118,9 @@ const SequencerUI = (() => {
     const swingSlider = document.getElementById('swing-slider');
     const swingValue = document.getElementById('swing-value');
     swingSlider.addEventListener('input', () => {
-      swingValue.textContent = swingSlider.value + '%';
+      const val = parseInt(swingSlider.value);
+      swingValue.textContent = val + '%';
+      Sequencer.setSwing(val);
     });
 
     // ---- Pattern selector ----
@@ -191,13 +195,13 @@ const SequencerUI = (() => {
     const stepNums = document.getElementById('step-numbers');
     if (!grid || !stepNums) return;
 
-    // Spacer matching track-info column width, then 16 numbers with matching gap
-    stepNums.innerHTML = '<div class="track-info" style="opacity:0"><span class="track-name">TRACK</span><div class="track-controls"><button>M</button><button>S</button><input></div></div>';
-    stepNums.innerHTML += '<div class="step-num-group">';
+    // Build step numbers
+    let numsHTML = '<div class="step-num-group">';
     for (let i = 0; i < 16; i++) {
-      stepNums.innerHTML += '<span class="step-num' + (i % 4 === 0 ? ' beat' : '') + '">' + (i + 1) + '</span>';
+      numsHTML += '<span class="step-num' + (i % 4 === 0 ? ' beat' : '') + '" data-step="' + i + '">' + (i + 1) + '</span>';
     }
-    stepNums.innerHTML += '</div>';
+    numsHTML += '</div>';
+    stepNums.innerHTML = numsHTML;
 
     // Track rows
     grid.innerHTML = '';
@@ -304,14 +308,6 @@ const SequencerUI = (() => {
       row.appendChild(stepsDiv);
       grid.appendChild(row);
     });
-
-    // Spacer matching track-info column width, then 16 numbers with matching gap
-    stepNums.innerHTML = '<div class="track-info" style="height:0;pointer-events:none;min-width:unset"></div>';
-    stepNums.innerHTML += '<div style="flex:1;display:flex;gap:3px;justify-content:center">';
-    for (let i = 0; i < 16; i++) {
-      stepNums.innerHTML += '<span class="step-num' + (i % 4 === 0 ? ' beat' : '') + '">' + (i + 1) + '</span>';
-    }
-    stepNums.innerHTML += '</div>';
   }
 
   // ---- playPreview: trigger a sound for click feedback ----
@@ -338,7 +334,7 @@ const SequencerUI = (() => {
         btn.classList.remove('playing');
       }
     });
-    document.querySelectorAll('.step-num').forEach(span => {
+    document.querySelectorAll('#step-numbers .step-num').forEach(span => {
       if (parseInt(span.dataset.step) === currentStep) {
         span.style.color = '#00ff88';
       } else {
@@ -544,6 +540,7 @@ const SequencerUI = (() => {
   }
 
   function buildDistortionCurve(curve, amount) {
+    if (!curve) return;
     const k = amount * 100;
     const samples = 44100;
     for (let i = 0; i < samples; i++) {
@@ -613,6 +610,7 @@ const SequencerUI = (() => {
 
     // Distortion waveshaper
     const waveshaper = ctx.createWaveShaper();
+    waveshaper.curve = new Float32Array(44100);
     buildDistortionCurve(waveshaper.curve, 0);
     waveshaper.oversample = '2x';
 
@@ -639,6 +637,6 @@ const SequencerUI = (() => {
     init, buildGrid, updateStepHighlight, loadPattern,
     randomizePattern, savePattern, savedPatterns,
     loadPatternFromStorage, renderSavedPatterns,
-    initFX, fxState
+    initFX, fxState, showLoadDialog
   };
 })();

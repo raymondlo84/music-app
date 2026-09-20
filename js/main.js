@@ -28,12 +28,21 @@
 
   // Lazy-init audio context on first user gesture
   let audioInitialized = false;
-  document.addEventListener('click', function initAudioOnce() {
+  function initAudioOnce(e) {
     if (!audioInitialized) {
       AudioEngine.resume();
       audioInitialized = true;
     }
     // Remove this listener so it only fires once
     document.removeEventListener('click', initAudioOnce, true);
-  }, true);
+  }
+  document.addEventListener('click', initAudioOnce, true);
+
+  // Also ensure resume on play button specifically
+  const btnPlayEl = document.getElementById('btn-play');
+  if (btnPlayEl) {
+    btnPlayEl.addEventListener('click', () => {
+      AudioEngine.resume();
+    }, true);
+  }
 })();

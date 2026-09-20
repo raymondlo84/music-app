@@ -89,12 +89,32 @@ const AudioEngine = (() => {
   }
 
   function resume() {
-    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume();
+    }
+  }
+
+  function ensureReady() {
+    return new Promise(resolve => {
+      if (!ctx) {
+        init();
+      }
+      if (ctx.state === 'running') {
+        resolve();
+        return;
+      }
+      if (ctx.state === 'closed') {
+        // Reinitialize if closed
+        ctx.close().catch(() => {});
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      ctx.resume().then(resolve).catch(resolve);
+    });
   }
 
   return {
     init, getContext, getMasterGain, getAnalyser,
-    getTrackGain, setTrackMute, isTrackMuted, resume,
+    getTrackGain, setTrackMute, isTrackMuted, resume, ensureReady,
     getReverbWet, setReverbWet,
     getDelayWet, setDelayWet,
     getDistortionCurve, setDistortionCurve,

@@ -205,12 +205,20 @@ body {
 .step-numbers {
   display: flex;
   align-items: center;
+  padding: 0 0 8px 0;
+  gap: 0;
+}
+
+.step-num-group {
+  display: flex;
   gap: 3px;
-  padding: 0 0 8px 153px;
+  flex: 1;
+  padding-left: 153px;
 }
 
 .step-num {
   width: var(--step-size);
+  min-width: var(--step-size);
   text-align: center;
   color: var(--text-dim);
   font-size: 10px;
