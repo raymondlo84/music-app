@@ -37,10 +37,14 @@ const AudioEngine = (() => {
       compressor.gain.value = 1;
     }
 
-    // Analyser for visualizer — connected later by UI.initFX() in the FX chain
+    masterGain.connect(compressor);
+    compressor.connect(ctx.destination);
+
+    // Analyser for visualizer — default direct connection, replaced by FX chain later
     analyser = ctx.createAnalyser();
     analyser.fftSize = 128;
     analyser.smoothingTimeConstant = 0.3;
+    masterGain.connect(analyser);
 
     return ctx;
   }
