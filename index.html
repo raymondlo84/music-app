@@ -3,36 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎤 FREESTYLE FORGE — Beat Sequencer</title>
+  <title>🎤 FREESTYLE FORGE — Beat Studio</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div id="app">
     <!-- Header -->
     <header class="header">
-      <h1>RAP STUDIO</h1>
-      <p class="subtitle">BEAT SEQUENCER</p>
+      <h1>🎤 FREESTYLE FORGE</h1>
+      <p class="subtitle">RAP BEAT STUDIO</p>
     </header>
 
-    <!-- Pattern selector -->
-    <div class="patterns">
-      <select id="pattern-select">
-        <option value="boomBap">Boom Bap (90 BPM)</option>
-        <option value="boom">Boom (95 BPM)</option>
-        <option value="trap">Trap (145 BPM)</option>
-      </select>
+    <!-- Visualizer -->
+    <div class="visualizer-container">
+      <canvas id="visualizer"></canvas>
     </div>
 
     <!-- Transport controls -->
     <div class="transport">
       <button id="btn-play" class="btn btn-play">▶ PLAY</button>
       <button id="btn-stop" class="btn btn-stop">■ STOP</button>
+      <button id="btn-punch" class="btn btn-punch" title="Record punch-in over current beat">⏺ PUNCH</button>
       <div class="bpm-control">
         <label for="bpm-slider">BPM</label>
         <input type="range" id="bpm-slider" min="60" max="200" value="95" step="1">
         <span id="bpm-value">95</span>
       </div>
-      <div class="step-indicator" id="step-display">-</div>
+      <div class="swing-control">
+        <label for="swing-slider">SWING</label>
+        <input type="range" id="swing-slider" min="0" max="100" value="0" step="5">
+        <span id="swing-value">0%</span>
+      </div>
+      <div class="step-indicator" id="step-display">1</div>
+    </div>
+
+    <!-- Pattern selector + randomizer + save -->
+    <div class="toolbar">
+      <select id="pattern-select">
+        <option value="boomBap">🥊 Boom Bap (90 BPM)</option>
+        <option value="boom">💣 Boom (95 BPM)</option>
+        <option value="trap">⚡ Trap (145 BPM)</option>
+        <option value="drill">🔫 Drill (140 BPM)</option>
+        <option value="lofi">☕ Lo-Fi (80 BPM)</option>
+        <option value="90s">📼 90s Classic (92 BPM)</option>
+      </select>
+      <button id="btn-randomize" class="btn btn-randomize">🎲 RANDOMIZE</button>
+      <button id="btn-save-pattern" class="btn btn-save">💾 SAVE</button>
+      <button id="btn-load-pattern" class="btn btn-load">📂 LOAD</button>
     </div>
 
     <!-- Step numbers -->
@@ -45,9 +62,44 @@
       <!-- Rendered by UI -->
     </div>
 
+    <!-- FX Section -->
+    <div class="fx-section">
+      <h2 class="fx-title">🎛 FX CHAIN</h2>
+      <div class="fx-grid">
+        <div class="fx-knob" data-fx="reverb">
+          <span class="fx-label">REVERB</span>
+          <input type="range" class="fx-slider" min="0" max="100" value="20" data-fx="reverb">
+          <span class="fx-value" id="fx-reverb">20%</span>
+        </div>
+        <div class="fx-knob" data-fx="delay">
+          <span class="fx-label">DELAY</span>
+          <input type="range" class="fx-slider" min="0" max="100" value="0" data-fx="delay">
+          <span class="fx-value" id="fx-delay">0%</span>
+        </div>
+        <div class="fx-knob" data-fx="distortion">
+          <span class="fx-label">DISTORT</span>
+          <input type="range" class="fx-slider" min="0" max="100" value="0" data-fx="distortion">
+          <span class="fx-value" id="fx-distortion">0%</span>
+        </div>
+        <div class="fx-knob" data-fx="filter">
+          <span class="fx-label">FILTER</span>
+          <input type="range" class="fx-slider" min="200" max="10000" value="10000" data-fx="filter">
+          <span class="fx-value" id="fx-filter">ALL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved patterns -->
+    <div class="saved-section">
+      <h2 class="fx-title">📁 SAVED PATTERNS</h2>
+      <div class="saved-list" id="saved-list">
+        <p class="empty-msg">No saved patterns yet. Hit 💾 SAVE!</p>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
-      CLICK STEPS TO BUILD BEATS · ADJUST BPM · HIT PLAY
+      CLICK STEPS TO BUILD BEATS · ADJUST BPM · USE 🎲 FOR INSPIRATION · SAVE & LOAD YOUR FAVORITES
     </footer>
   </div>
 
@@ -55,6 +107,7 @@
   <script src="js/audio_engine.js"></script>
   <script src="js/synth.js"></script>
   <script src="js/sequencer.js"></script>
+  <script src="js/visualizer.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
 </body>

@@ -1,6 +1,6 @@
 /**
  * Audio Engine Module
- * Web Audio API context management, master chain, analyser for visualization
+ * Web Audio API context management, master chain, analyser, FX chain
  */
 const AudioEngine = (() => {
   let ctx = null;
@@ -9,6 +9,14 @@ const AudioEngine = (() => {
   let analyser = null;
   let trackGains = {};
   let trackMutes = {};
+
+  // FX chain nodes (wired by UI.initFX)
+  let _reverbWet = null;
+  let _reverbDry = null;
+  let _delayWet = null;
+  let _delayNode = null;
+  let _distortionCurve = null;
+  let _filterNode = null;
 
   function init() {
     if (ctx) return ctx;
@@ -32,9 +40,9 @@ const AudioEngine = (() => {
     masterGain.connect(compressor);
     compressor.connect(ctx.destination);
 
-    // Analyser for visualizer
+    // Analyser for visualizer — default direct connection, replaced by FX chain later
     analyser = ctx.createAnalyser();
-    analyser.fftSize = 64;
+    analyser.fftSize = 128;
     analyser.smoothingTimeConstant = 0.3;
     masterGain.connect(analyser);
 
@@ -49,6 +57,16 @@ const AudioEngine = (() => {
 
   function getMasterGain() { return masterGain; }
   function getAnalyser() { return analyser; }
+
+  // FX getters/setters
+  function getReverbWet() { return _reverbWet; }
+  function setReverbWet(v) { _reverbWet = v; }
+  function getDelayWet() { return _delayWet; }
+  function setDelayWet(v) { _delayWet = v; }
+  function getDistortionCurve() { return _distortionCurve; }
+  function setDistortionCurve(v) { _distortionCurve = v; }
+  function getFilterNode() { return _filterNode; }
+  function setFilterNode(v) { _filterNode = v; }
 
   function getTrackGain(name) {
     if (!trackGains[name]) {
@@ -74,5 +92,12 @@ const AudioEngine = (() => {
     if (ctx && ctx.state === 'suspended') ctx.resume();
   }
 
-  return { init, getContext, getMasterGain, getAnalyser, getTrackGain, setTrackMute, isTrackMuted, resume };
+  return {
+    init, getContext, getMasterGain, getAnalyser,
+    getTrackGain, setTrackMute, isTrackMuted, resume,
+    getReverbWet, setReverbWet,
+    getDelayWet, setDelayWet,
+    getDistortionCurve, setDistortionCurve,
+    getFilterNode, setFilterNode
+  };
 })();
