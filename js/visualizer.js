@@ -12,9 +12,11 @@ const Visualizer = (() => {
   let stepSize = 1;
 
   function resizeCanvas() {
-    if (!canvas) return;
-    canvas.width = canvas.offsetWidth || 900;
-    canvas.height = canvas.offsetHeight || 100;
+    if (!canvas || !canvas.parentElement) return;
+    const container = canvas.parentElement;
+    const rect = container.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
   }
 
   function draw() {
@@ -68,7 +70,7 @@ const Visualizer = (() => {
     // Resize immediately
     resizeCanvas();
 
-    // Use setInterval for reliable animation in headless/served pages
+    // Use setInterval for reliable animation
     animInterval = setInterval(draw, 50);
     draw();
 
