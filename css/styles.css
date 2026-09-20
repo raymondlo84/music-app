@@ -604,8 +604,6 @@ body {
   color: #000;
 }
 
-/* Visualizer container */
-
 
 /* Swing control */
 .swing-control {
@@ -647,19 +645,4 @@ body {
   font-size: 12px;
   min-width: 30px;
   text-align: center;
-}
-
-.swing-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-}
-
-.swing-control label {
-  color: var(--text-dim);
-  font-size: 11px;
-  letter-spacing: 1px;
 }
