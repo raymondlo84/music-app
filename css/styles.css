@@ -207,6 +207,7 @@ body {
   justify-content: center;
   gap: 0;
   padding: 0 0 8px;
+  width: 100%;
 }
 
 .step-num {
@@ -215,11 +216,24 @@ body {
   color: var(--text-dim);
   font-size: 10px;
   letter-spacing: 1px;
+  flex-shrink: 0;
+  margin-left: 0;
 }
 
 .step-num.beat {
   color: var(--text);
   font-weight: 600;
+}
+
+/* Align step numbers with track-steps column, not the full row */
+.track-info {
+  flex-shrink: 0;
+  min-width: auto;
+  width: 100px;
+}
+
+.sequencer-grid .track-row > .track-steps {
+  margin-left: 0;
 }
 
 /* Sequencer grid */

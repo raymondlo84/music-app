@@ -4,16 +4,19 @@
  */
 const Visualizer = (() => {
   let animId = null;
+  let canvas = null;
+  let ctx = null;
+  let analyser = null;
 
   function start() {
-    const canvas = document.getElementById('visualizer');
+    canvas = document.getElementById('visualizer');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const analyser = AudioEngine.getAnalyser();
+    ctx = canvas.getContext('2d');
+    analyser = AudioEngine.getAnalyser();
     if (!analyser) return;
 
-    canvas.width = canvas.offsetWidth || 900;
-    canvas.height = canvas.offsetHeight || 100;
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
@@ -24,6 +27,7 @@ const Visualizer = (() => {
       animId = requestAnimationFrame(draw);
       analyser.getByteFrequencyData(dataArray);
 
+      resizeCanvas();
       ctx.fillStyle = '#0d0d0d';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -52,11 +56,18 @@ const Visualizer = (() => {
     draw();
   }
 
+  function resizeCanvas() {
+    if (!canvas) return;
+    canvas.width = canvas.offsetWidth || 900;
+    canvas.height = canvas.offsetHeight || 100;
+  }
+
   function stop() {
     if (animId) {
       cancelAnimationFrame(animId);
       animId = null;
     }
+    window.removeEventListener('resize', resizeCanvas);
   }
 
   return { start, stop };
