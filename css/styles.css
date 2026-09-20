@@ -206,7 +206,13 @@ body {
   display: flex;
   align-items: center;
   gap: 3px;
-  padding: 0 0 8px 100px;
+  padding: 0 0 8px;
+}
+
+.step-num-group {
+  flex: 1;
+  display: flex;
+  gap: 3px;
 }
 
 .step-num {

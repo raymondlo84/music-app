@@ -191,15 +191,13 @@ const SequencerUI = (() => {
     const stepNums = document.getElementById('step-numbers');
     if (!grid || !stepNums) return;
 
-    // Step numbers - CSS handles padding (100px left offset for track-info column) and gap
-    stepNums.innerHTML = '';
+    // Spacer matching track-info column width, then 16 numbers with matching gap
+    stepNums.innerHTML = '<div class="track-info" style="opacity:0"><span class="track-name">TRACK</span><div class="track-controls"><button>M</button><button>S</button><input></div></div>';
+    stepNums.innerHTML += '<div class="step-num-group">';
     for (let i = 0; i < 16; i++) {
-      const span = document.createElement('span');
-      span.className = 'step-num' + (i % 4 === 0 ? ' beat' : '');
-      span.textContent = i + 1;
-      span.dataset.step = i;
-      stepNums.appendChild(span);
+      stepNums.innerHTML += '<span class="step-num' + (i % 4 === 0 ? ' beat' : '') + '">' + (i + 1) + '</span>';
     }
+    stepNums.innerHTML += '</div>';
 
     // Track rows
     grid.innerHTML = '';
@@ -306,6 +304,14 @@ const SequencerUI = (() => {
       row.appendChild(stepsDiv);
       grid.appendChild(row);
     });
+
+    // Spacer matching track-info column width, then 16 numbers with matching gap
+    stepNums.innerHTML = '<div class="track-info" style="height:0;pointer-events:none;min-width:unset"></div>';
+    stepNums.innerHTML += '<div style="flex:1;display:flex;gap:3px;justify-content:center">';
+    for (let i = 0; i < 16; i++) {
+      stepNums.innerHTML += '<span class="step-num' + (i % 4 === 0 ? ' beat' : '') + '">' + (i + 1) + '</span>';
+    }
+    stepNums.innerHTML += '</div>';
   }
 
   // ---- playPreview: trigger a sound for click feedback ----
