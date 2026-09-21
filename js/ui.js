@@ -577,50 +577,43 @@ const SequencerUI = (() => {
   function initFX() {
     const ctx = AudioEngine.getContext();
 
-    // Reverb convolver
+    const masterGain = AudioEngine.getMasterGain();
+    const analyser = AudioEngine.getAnalyser();
+
+    // Reverb (convolver)
     const convolver = ctx.createConvolver();
-    const rate = ctx.sampleRate;
-    const length = rate * 2;
-    const impulse = ctx.createBuffer(2, length, rate);
+    const impulse = ctx.createBuffer(2, ctx.sampleRate * 2, ctx.sampleRate);
     for (let ch = 0; ch < 2; ch++) {
       const data = impulse.getChannelData(ch);
-      for (let i = 0; i < length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2);
       }
     }
     convolver.buffer = impulse;
 
     const reverbWet = ctx.createGain();
     reverbWet.gain.value = fxState.reverb / 100 * 0.7;
-
     const reverbDry = ctx.createGain();
     reverbDry.gain.value = 1.0;
-
     const reverbMerge = ctx.createGain();
 
-    const masterGain = AudioEngine.getMasterGain();
     masterGain.connect(reverbDry);
     masterGain.connect(convolver);
     convolver.connect(reverbWet);
-
     reverbDry.connect(reverbMerge);
     reverbWet.connect(reverbMerge);
 
-    // Wire: reverbMerge -> delayDry -> filter -> analyser
+    // Delay chain
     const delayDry = ctx.createGain();
     delayDry.gain.value = 1.0;
     reverbMerge.connect(delayDry);
 
-    // Delay
     const delayNode = ctx.createDelay(5.0);
     delayNode.delayTime.value = 0.3;
-
     const delayFeedback = ctx.createGain();
     delayFeedback.gain.value = 0.3;
-
     const delayWet = ctx.createGain();
     delayWet.gain.value = fxState.delay / 100 * 0.5;
-
     const delayMerge = ctx.createGain();
 
     delayDry.connect(delayMerge);
@@ -636,6 +629,7 @@ const SequencerUI = (() => {
     buildDistortionCurve(waveshaper.curve, 0);
     waveshaper.oversample = '2x';
 
+    // Filter (lowpass)
     const filterNode = ctx.createBiquadFilter();
     filterNode.type = 'lowpass';
     filterNode.frequency.value = fxState.filter;
@@ -644,7 +638,9 @@ const SequencerUI = (() => {
     delayMerge.connect(waveshaper);
     waveshaper.connect(filterNode);
 
-    const analyser = AudioEngine.getAnalyser();
+    // Rewire: FX chain → analyser → destination
+    // Disconnect the old chain so analyser doesn't double-output to destination
+    analyser.disconnect(ctx.destination);
     filterNode.connect(analyser);
     analyser.connect(ctx.destination);
 

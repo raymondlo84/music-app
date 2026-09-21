@@ -249,8 +249,21 @@ const Synthesizer = (() => {
     noise.stop(time + 0.04);
   }
 
-  // 808-STYLE BASS: sustained sine with sub
+  // 808-STYLE BASS: sustained sine with sub (stops previous osc before starting new)
+  let _bassOsc1 = null, _bassOsc2 = null, _bassGain = null;
+
   function bass(time, options = {}) {
+    // Stop previous bass sound cleanly
+    if (_bassGain) {
+      try {
+        _bassGain.gain.cancelScheduledValues(time);
+        _bassGain.gain.setValueAtTime(_bassGain.gain.value, time);
+        _bassGain.gain.linearRampToValueAtTime(0, time + 0.005);
+      } catch {}
+      if (_bassOsc1) { try { _bassOsc1.stop(time + 0.01); } catch {} }
+      if (_bassOsc2) { try { _bassOsc2.stop(time + 0.01); } catch {} }
+    }
+
     const note = options.note || 55; // A1 by default
     const duration = options.duration || 0.3;
     const gain = options.gain || 1.0;
@@ -263,19 +276,22 @@ const Synthesizer = (() => {
     osc2.type = 'sine';
     osc2.frequency.setValueAtTime(note * 0.5, time);
 
-    const gainNode = ctx.createGain();
-    gainNode.gain.setValueAtTime(0, time);
-    gainNode.gain.setValueAtTime(gain * 0.7, time + 0.01);
-    gainNode.gain.setValueAtTime(gain * 0.5, time + duration * 0.5);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, time + duration);
+    _bassGain = ctx.createGain();
+    _bassGain.gain.setValueAtTime(0, time);
+    _bassGain.gain.setValueAtTime(gain * 0.7, time + 0.01);
+    _bassGain.gain.setValueAtTime(gain * 0.5, time + duration * 0.5);
+    _bassGain.gain.exponentialRampToValueAtTime(0.001, time + duration);
 
-    osc.connect(gainNode);
-    osc2.connect(gainNode);
-    gainNode.connect(AudioEngine.getMasterGain());
+    osc.connect(_bassGain);
+    osc2.connect(_bassGain);
+    _bassGain.connect(AudioEngine.getMasterGain());
     osc.start(time);
     osc2.start(time);
     osc.stop(time + duration);
     osc2.stop(time + duration);
+
+    _bassOsc1 = osc;
+    _bassOsc2 = osc2;
   }
 
   // SIDESTASH (pump effect) - ramps down gain then back up
