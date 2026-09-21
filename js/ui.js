@@ -210,6 +210,13 @@ const SequencerUI = (() => {
     tracks.forEach((track) => {
       const row = document.createElement('div');
       row.className = 'track-row';
+      row.dataset.track = track.name;
+
+      if (track.muted) {
+        row.classList.add('muted');
+      } else if (Sequencer.isAnySolo() && track.solo) {
+        row.classList.add('solo-only');
+      }
 
       // Track label + controls
       const trackInfo = document.createElement('div');
@@ -234,7 +241,12 @@ const SequencerUI = (() => {
         if (t) {
           t.muted = !t.muted;
           e.target.classList.toggle('muted', t.muted);
-          e.target.closest('.track-row').style.opacity = t.muted ? 0.4 : 1;
+          const row = e.target.closest('.track-row');
+          row.classList.toggle('muted', t.muted);
+          row.classList.remove('solo-only');
+          if (!t.muted && Sequencer.isAnySolo() && t.solo) {
+            row.classList.add('solo-only');
+          }
         }
       });
 
@@ -250,6 +262,11 @@ const SequencerUI = (() => {
         if (t) {
           t.solo = !t.solo;
           e.target.classList.toggle('active', t.solo);
+          const row = e.target.closest('.track-row');
+          row.classList.remove('muted', 'solo-only');
+          if (!t.muted && Sequencer.isAnySolo() && t.solo) {
+            row.classList.add('solo-only');
+          }
         }
       });
 
@@ -337,9 +354,9 @@ const SequencerUI = (() => {
     });
     document.querySelectorAll('#step-numbers .step-num').forEach(span => {
       if (parseInt(span.dataset.step) === currentStep) {
-        span.style.color = '#00ff88';
+        span.classList.add('active-step');
       } else {
-        span.style.color = '';
+        span.classList.remove('active-step');
       }
     });
   }

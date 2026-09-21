@@ -197,7 +197,7 @@ const Sequencer = (() => {
   function getTotalSteps() { return totalSteps; }
 
   return {
-    initTracks, start, stop, toggle, shouldPlay,
+    initTracks, start, stop, toggle, shouldPlay, isAnySolo,
     toggleStep, setStep, setVolume, setMute, setSolo, setSwing,
     getTrack, getTrackByName, getTrackIndex, setBPM,
     onStep, onPlayState, getTotalSteps,
