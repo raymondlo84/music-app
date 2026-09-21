@@ -192,16 +192,7 @@ const SequencerUI = (() => {
   // ---- buildGrid: create track rows inside existing #sequencer-grid ----
   function buildGrid() {
     const grid = document.getElementById('sequencer-grid');
-    const stepNums = document.getElementById('step-numbers');
-    if (!grid || !stepNums) return;
-
-    // Build step numbers
-    let numsHTML = '<div class="step-num-group">';
-    for (let i = 0; i < 16; i++) {
-      numsHTML += '<span class="step-num' + (i % 4 === 0 ? ' beat' : '') + '" data-step="' + i + '">' + (i + 1) + '</span>';
-    }
-    numsHTML += '</div>';
-    stepNums.innerHTML = numsHTML;
+    if (!grid) return;
 
     // Track rows
     grid.innerHTML = '';
@@ -350,13 +341,6 @@ const SequencerUI = (() => {
         btn.classList.add('playing');
       } else {
         btn.classList.remove('playing');
-      }
-    });
-    document.querySelectorAll('#step-numbers .step-num').forEach(span => {
-      if (parseInt(span.dataset.step) === currentStep) {
-        span.classList.add('active-step');
-      } else {
-        span.classList.remove('active-step');
       }
     });
   }
