@@ -2,6 +2,8 @@
 
 A browser-based rap beat sequencer. No dependencies, no build step — just open `index.html` and make beats.
 
+![Freestyle Forge Demo](./demo-screenshot.png)
+
 ## Features
 
 - **7 instrument tracks**: kick, snare, hihat, clap, rim, shaker, bass
